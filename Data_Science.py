@@ -54,9 +54,6 @@ product_grid = WebDriverWait(driver, 10).until(
     EC.visibility_of_element_located((By.XPATH, '//div[@data-qa-locator="general-products"]'))
 )
 
-# Print the product grid for debugging
-print("Product Grid:", product_grid)
-
 # Get links directly from the search result page
 data = driver.page_source
 soup = bs4.BeautifulSoup(data, 'html.parser')
@@ -68,13 +65,31 @@ if product_grid:
     # Find all product items in the grid
     product_elements = product_grid.find_all('div', {'data-qa-locator': 'product-item'})[:10]
 
-    # Print the first 10 product elements for debugging
-    print("First 10 Product Elements:")
+    # Extract details from each product element with error handling
     for index, element in enumerate(product_elements, 1):
-        print(f"{index}. {element}")
+        title = element.find('div', {'class': 'RfADt'}).find('a')['title']
+        price = element.find('span', {'class': 'ooOxS'}).text
+
+        # Error handling for discount
+        discount_element = element.find('span', {'class': 'IcOsH'})
+        discount = discount_element.text if discount_element else None
+
+        sold_count_element = element.find('span', {'class': '_1cEkb'})
+        sold_count = sold_count_element.find_all('span')[0].text if sold_count_element else None
+
+        location_element = element.find('span', {'class': 'oa6ri'})
+        location = location_element.text if location_element else None
+
+        print(f"{index}. Title: {title}")
+        print(f"   Price: {price}")
+        print(f"   Discount: {discount}")
+        print(f"   Sold Count: {sold_count}")
+        print(f"   Location: {location}")
+        print("\n")
 
 # Close the main driver when you're done    
 driver.quit()
+
 
 
 
